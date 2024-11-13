@@ -1,0 +1,14 @@
+---
+import Layout from "@layouts/Layout.astro";
+import FFlow from "@components/Flow";
+---
+
+<Layout title="Flow">
+  <div class="flex justify-between px-4">
+    <h3 class="prose">FLOW</h3>
+    <a href="/">Go to Home</a>
+  </div>
+  <div class="w-full h-screen p-10 bg-zinc-900">
+    <FFlow client:only="react" />
+  </div>
+</Layout>
