@@ -1,101 +1,28 @@
 ---
 import Layout from "@layouts/Layout.astro";
-import Card from "@components/Card.astro";
-import doQuery from "@lib/doQuery";
-
-const query = `
- query AllDocs {
-  allDocuments {
-    id
-    slug
-    title
-    version
-    sections {
-      ...sectionFragment
-    }
-  }
-}
-
-fragment sectionFragment on SectionRecord {
-  id
-  page {
-    ...pageFragment
-  }
-  subsections {
-    id
-    page {
-      ...pageFragment
-    }
-    subsections {
-      id
-      page {
-        ...pageFragment
-      }
-    }
-  }
-}
-
-fragment pageFragment on PageRecord {
-  id
-  slug
-  title
-  content {
-    __typename
-    blocks {
-      __typename
-      id
-    }
-  }
-}
-`;
-const data = await doQuery(query);
+import { getDocuments } from "@lib/fetchData";
+// import { getCollection } from "astro:content";
+// const docs = await getCollection("docs");
+const docs = await getDocuments();
 ---
 
-<Layout title="Welcome to Astro.">
-  <div class="w-full mx-auto p-16">
-    <div class="w-full prose prose-xl">
+<Layout title='Welcome to Astro.'>
+  <div class='w-full mx-auto p-16'>
+    <div class='w-full prose prose-xl'>
       <h1>Hello World</h1>
-      <div class="w-full grid grid-cols-3 gap-4">
+      <div class='w-full grid grid-cols-3 gap-4'>
         {
-          data?.allDocuments?.map((item: any) => {
+          docs?.map((item: any) => {
             return (
-              <div>
-                <h4>{item.title}</h4>
-                <p>{item.version}</p>
-              </div>
+              <a href={`/docs/${item.slug}`}>
+                <div>
+                  <h4>{item.title}</h4>
+                  <p>{item.version}</p>
+                </div>
+              </a>
             );
           })
         }
-      </div>
-      <h2>About this template</h2>
-      <p>This is a simple starter setup utilizing:</p>
-      <ul>
-        <li><a href="/my-flow">Go to My-Flow Page</a></li>
-        <li><a href="/flow">Go to the Flow Page</a></li>
-        <li><a href="https://daisyui.com">Daisy UI</a></li>
-        <li><a href="https://daisyui.com">Tailwind CSS</a></li>
-      </ul>
-      <p>This template is fully <code>typesafe</code>.</p>
-      <h2>Path Aliases:</h2>
-      <li>
-        <code>@components/*</code> path alias goes to <code
-          >./src/components/*</code
-        >
-      </li>
-      <li>
-        <code>@lib/*</code> path alias goes to <code>./src/lib/*</code>
-      </li>
-      <li>
-        <code>@assets/*</code> path alias goes to <code>./src/assets/*</code>
-      </li>
-      <li>
-        <code>@layouts/*</code> path alias goes to <code>./src/layouts/*</code>
-      </li>
-    </div>
-    <div class="pt-10 prose xl:prose-xl">
-      <h2>Components:</h2>
-      <div class="pb-20">
-        <Card title="Card Title" body="Card Body" href="https://lorezz.me" />
       </div>
     </div>
   </div>

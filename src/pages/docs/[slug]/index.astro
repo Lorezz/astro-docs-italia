@@ -1,0 +1,23 @@
+---
+import Layout from "@layouts/Layout.astro";
+import { getDocuments } from "@lib/fetchData";
+
+export async function getStaticPaths() {
+  const docs = await getDocuments();
+  return docs?.map((item: any) => {
+    return { params: { slug: item.slug } };
+  });
+}
+const { slug }: any = Astro.params;
+const docs = await getDocuments();
+const doc = docs.allDocuments?.find((d: any) => d.slug === slug);
+---
+
+<Layout title={doc.title}>
+  <div>Detail of {slug}!</div>
+  <h1>{doc.title}</h1>
+  <div>{doc.version}</div>
+  <div>
+    {doc.sections?.map((section: any) => <li>{section.page?.title}</li>)}
+  </div>
+</Layout>
