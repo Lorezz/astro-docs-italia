@@ -10,14 +10,22 @@ export async function getStaticPaths() {
 }
 const { slug }: any = Astro.params;
 const docs = await getDocuments();
-const doc = docs.allDocuments?.find((d: any) => d.slug === slug);
+const doc = docs?.find((d: any) => d.slug === slug);
 ---
 
-<Layout title={doc.title}>
+<Layout title={doc?.title}>
   <div>Detail of {slug}!</div>
-  <h1>{doc.title}</h1>
+  <h1>{doc?.title}</h1>
   <div>{doc.version}</div>
   <div>
-    {doc.sections?.map((section: any) => <li>{section.page?.title}</li>)}
+    {
+      doc.sections?.map((section: any) => (
+        <li>
+          <a href={`/docs/${slug}/section/${section.page.slug}`}>
+            {section.page?.title}
+          </a>
+        </li>
+      ))
+    }
   </div>
 </Layout>

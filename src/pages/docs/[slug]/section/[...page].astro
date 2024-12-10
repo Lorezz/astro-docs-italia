@@ -1,0 +1,36 @@
+---
+import Layout from "@layouts/Layout.astro";
+import { getDocuments, getAllPAges } from "@lib/fetchData";
+
+// export const prerender = false;
+export async function getStaticPaths() {
+  const docs = await getDocuments();
+  const allPages = await getAllPAges();
+  const paths = docs?.reduce((all: any, doc: any) => {
+    const pages = allPages.filter((p: any) => p.doc === doc.id);
+    const results = pages.map((data: any) => {
+      return {
+        params: { slug: doc.slug, page: data.slug },
+        props: { data, doc },
+      };
+    });
+    return [...all, ...results];
+  }, []);
+  console.log("paths", paths);
+  return paths;
+}
+
+const { slug, page }: any = Astro.params;
+const { doc, data }: any = Astro.props;
+// const docs = await getDocuments();
+console.log("page ", page);
+console.log("slug", slug);
+console.log("doc ", doc);
+console.log("data", data.title);
+---
+
+<Layout title={`${data.title} - ${doc.title}`}>
+  <h1>{`${data.title}  `}</h1>
+  <small>{`${doc.title}`}</small>
+  <div></div>
+</Layout>

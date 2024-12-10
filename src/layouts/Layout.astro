@@ -4,30 +4,30 @@ interface Props {
   theme?: "italia" | "dracula";
 }
 
-const { title, theme = "italia" } = Astro.props;
+const { title, theme = "dracula" } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang='en'>
   <head>
-    <meta charset="UTF-8" />
-    <meta name="description" content="Astro description" />
-    <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="generator" content={Astro.generator} />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <meta charset='UTF-8' />
+    <meta name='description' content='Astro description' />
+    <meta name='viewport' content='width=device-width' />
+    <link rel='icon' type='image/svg+xml' href='/favicon.svg' />
+    <meta name='generator' content={Astro.generator} />
+    <link rel='preconnect' href='https://fonts.googleapis.com' />
+    <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,400..700;1,400..700&display=swap"
-      rel="stylesheet"
+      href='https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,400..700;1,400..700&display=swap'
+      rel='stylesheet'
     />
     <link
-      href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,200..700;1,200..700&display=swap"
-      rel="stylesheet"
+      href='https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,200..700;1,200..700&display=swap'
+      rel='stylesheet'
     />
     <title>{title}</title>
   </head>
-  <body data-theme={theme} class="flex flex-col min-h-screen w-full">
+  <body data-theme={theme} class='flex flex-col min-h-screen w-full p-4'>
     <slot />
   </body>
 </html>

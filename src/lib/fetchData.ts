@@ -1,80 +1,87 @@
 import doQuery from "./doQuery";
+import { graphql } from "./graphql";
 
-export async function getDocuments() {
-  const query = `
-query AllDocs {
-  allDocuments {
+const pageFragment = graphql(`
+  fragment pageFragment on PageRecord {
     id
     slug
     title
-    version
-    sections {
-      ...sectionFragment
+    content {
+      __typename
+      blocks {
+        __typename
+        id
+      }
     }
   }
-}
+`);
 
-fragment sectionFragment on SectionRecord {
-  id
-  page {
-    ...pageFragment
-  }
-  subsections {
-    id
-    page {
-      ...pageFragment
-    }
-    subsections {
+const sectionFragment = graphql(
+  `
+    fragment sectionFragment on SectionRecord {
       id
       page {
         ...pageFragment
       }
+      subsections {
+        id
+        page {
+          ...pageFragment
+        }
+        subsections {
+          id
+          page {
+            ...pageFragment
+          }
+        }
+      }
     }
-  }
-}
+  `,
+  [pageFragment]
+);
 
-fragment pageFragment on PageRecord {
-  id
-  slug
-  title
-  content {
-    __typename
-    blocks {
-      __typename
-      id
-    }
-  }
-}
-`;
+export async function getDocuments() {
+  const query = graphql(
+    `
+      query AllDocs {
+        allDocuments {
+          id
+          slug
+          title
+          version
+          sections {
+            ...sectionFragment
+          }
+        }
+      }
+    `,
+    [sectionFragment]
+  );
   const data = await doQuery(query);
 
   return data?.allDocuments;
 }
 
 async function getPages(first: number, skip: number) {
-  const query = `
-allPages(first: "100", skip: "0") {
-  docs:_allReferencingDocuments {
-    id
-  }
-  ...pageFragment
-}
-
-fragment pageFragment on PageRecord {
-  id
-  slug
-  title
-  content {
-    __typename
-    blocks {
-      __typename
-      id
-    }
-  }
-}
-`;
-  const data = await doQuery(query);
-  return data?.allPages;
+  const query = graphql(
+    `
+      query getPages($first: IntType, $skip: IntType) {
+        pages: allPages(first: $first, skip: $skip) {
+          docs: _allReferencingDocuments {
+            id
+          }
+          ...pageFragment
+        }
+      }
+    `,
+    [pageFragment]
+  );
+  const data = await doQuery(query, {
+    variables: { first, skip },
+    includeDrafts: true,
+  });
+  // console.log({ first, skip }, data?.pages?.length);
+  return data?.pages || null;
 }
 export async function getAllPAges() {
   let hasElements = true;
@@ -83,13 +90,20 @@ export async function getAllPAges() {
   let data: any = [];
   while (hasElements) {
     const results = await getPages(first, skip);
-    if (results) {
+    if (results && results.length > 0) {
       skip += first;
       data = [...data, ...results];
     } else {
       hasElements = false;
     }
   }
-
-  return data;
+  const formattedData = data
+    .filter((i: any) => i.docs?.[0]?.id)
+    .map((i: any) => {
+      let mod = { ...i, doc: i.docs?.[0]?.id || null };
+      delete mod.docs;
+      return mod;
+    });
+  // console.log(formattedData);
+  return formattedData;
 }
