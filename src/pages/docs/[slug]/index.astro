@@ -1,6 +1,7 @@
 ---
 import Layout from "@layouts/Layout.astro";
-import { getDocuments } from "@lib/fetchData";
+import { getDocuments, pageFragment } from "@lib/fetchData";
+import { readFragment } from "gql.tada";
 
 export async function getStaticPaths() {
   const docs = await getDocuments();
@@ -13,19 +14,25 @@ const docs = await getDocuments();
 const doc = docs?.find((d: any) => d.slug === slug);
 ---
 
-<Layout title={doc?.title}>
+<Layout title={doc?.title || ""}>
   <div>Detail of {slug}!</div>
-  <h1>{doc?.title}</h1>
-  <div>{doc.version}</div>
+  <h1>{doc?.title || ""}</h1>
+  <div>{doc?.version || ""}</div>
   <div>
     {
-      doc.sections?.map((section: any) => (
-        <li>
-          <a href={`/docs/${slug}/section/${section.page.slug}`}>
-            {section.page?.title}
-          </a>
-        </li>
-      ))
+      doc?.sections?.map((section) => {
+        const page = readFragment(pageFragment, section?.page);
+        return (
+          <li>
+            <a
+              class='link-primary'
+              href={`/docs/${slug}/section/${page?.slug}`}
+            >
+              {page?.title || ""}
+            </a>
+          </li>
+        );
+      })
     }
   </div>
 </Layout>

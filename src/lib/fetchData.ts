@@ -1,7 +1,7 @@
-import doQuery from "./doQuery";
+import executeQuery from "./doQuery";
 import { graphql } from "./graphql";
 
-const pageFragment = graphql(`
+export const pageFragment = graphql(`
   fragment pageFragment on PageRecord {
     id
     slug
@@ -16,50 +16,65 @@ const pageFragment = graphql(`
   }
 `);
 
-const sectionFragment = graphql(
-  `
-    fragment sectionFragment on SectionRecord {
-      id
-      page {
-        ...pageFragment
-      }
-      subsections {
-        id
-        page {
-          ...pageFragment
-        }
-        subsections {
-          id
-          page {
-            ...pageFragment
-          }
-        }
-      }
-    }
-  `,
-  [pageFragment]
-);
+// const sectionFragment = graphql(
+//   `
+//     fragment sectionFragment on SectionRecord {
+//       id
+//       page {
+//         ...pageFragment
+//       }
+//       subsections {
+//         id
+//         page {
+//           ...pageFragment
+//         }
+//         subsections {
+//           id
+//           page {
+//             ...pageFragment
+//           }
+//         }
+//       }
+//     }
+//   `,
+//   [pageFragment]
+// );
 
 export async function getDocuments() {
   const query = graphql(
     `
       query AllDocs {
-        allDocuments {
+        allDocuments(first: 100, skip: 0) {
           id
           slug
           title
           version
           sections {
-            ...sectionFragment
+            id
+            page {
+              ...pageFragment
+            }
+            subsections {
+              id
+              page {
+                ...pageFragment
+              }
+              subsections {
+                id
+                page {
+                  ...pageFragment
+                }
+              }
+            }
           }
         }
       }
     `,
-    [sectionFragment]
+    [pageFragment]
   );
-  const data = await doQuery(query);
-
-  return data?.allDocuments;
+  const data = await executeQuery(query, { includeDrafts: true });
+  console.log(data);
+  return data.allDocuments;
 }
 
 async function getPages(first: number, skip: number) {
@@ -76,12 +91,11 @@ async function getPages(first: number, skip: number) {
     `,
     [pageFragment]
   );
-  const data = await doQuery(query, {
+  const data = await executeQuery(query, {
     variables: { first, skip },
     includeDrafts: true,
   });
-  // console.log({ first, skip }, data?.pages?.length);
-  return data?.pages || null;
+  return data.pages || null;
 }
 export async function getAllPAges() {
   let hasElements = true;
