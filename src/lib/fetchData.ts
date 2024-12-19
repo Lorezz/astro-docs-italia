@@ -8,9 +8,42 @@ export const pageFragment = graphql(`
     title
     content {
       __typename
+      value
       blocks {
         __typename
         id
+        image {
+          responsiveImage(imgixParams: { fit: crop, w: 600, auto: format }) {
+            # always required
+            src
+            srcSet
+            width
+            height
+
+            # not required, but strongly suggested!
+            alt
+            title
+
+            # LQIP (base64-encoded)
+            base64
+
+            # you can omit 'sizes' if you explicitly pass the 'sizes' prop to the image component
+            sizes
+          }
+        }
+      }
+      links {
+        ... on PageRecord {
+          id
+          slug
+          title
+        }
+        ... on DocumentRecord {
+          id
+          slug
+          title
+          version
+        }
       }
     }
   }

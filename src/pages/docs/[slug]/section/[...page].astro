@@ -1,6 +1,7 @@
 ---
 import Layout from "@layouts/Layout.astro";
 import { getDocuments, getAllPAges } from "@lib/fetchData";
+import ContentBlock from "@components/ContentBlock.jsx";
 
 // export const prerender = false;
 export async function getStaticPaths() {
@@ -27,10 +28,16 @@ console.log("page ", page);
 console.log("slug", slug);
 console.log("doc ", doc);
 console.log("data", data.title);
+console.log("data", JSON.stringify(data, null, 2));
 ---
 
 <Layout title={`${data.title} - ${doc.title}`}>
-  <h1>{`${data.title}  `}</h1>
-  <small>{`${doc.title}`}</small>
-  <div></div>
+  <div>
+    <h1>{`${data.title}  `}</h1>
+    <small>{`${doc.title}`}</small>
+    <hr />
+    <div class='p-4 prose'>
+      <ContentBlock content={data.content} client:visible />
+    </div>
+  </div>
 </Layout>
